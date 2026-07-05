@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MainCrafts — Build Smarter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blueprint-navy:#142440;
+    --blueprint-navy-deep:#0d1a30;
+    --blueprint-line:#2c4a72;
+    --paper:#f5f1e8;
+    --paper-dim:#ece6d8;
+    --ink:#16202c;
+    --ink-soft:#4a5568;
+    --copper:#c97d3e;
+    --copper-dark:#a8642e;
+    --cyan:#6fbbc7;
+    --radius:2px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter', sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,h4{font-family:'Space Grotesk', sans-serif; font-weight:600; letter-spacing:-0.02em;}
+  a{text-decoration:none; color:inherit;}
+  ul{list-style:none;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  img,svg{display:block; max-width:100%;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none;}
+  .container{max-width:1180px; margin:0 auto; padding:0 32px;}
+
+  /* ===== Blueprint grid backdrop ===== */
+  .grid-bg{
+    background-color:var(--blueprint-navy);
+    background-image:
+      linear-gradient(var(--blueprint-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--blueprint-line) 1px, transparent 1px);
+    background-size:40px 40px;
+    background-position:center top;
+    position:relative;
+  }
+  .grid-bg::after{
+    content:"";
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at 50% 0%, rgba(20,36,64,0) 0%, var(--blueprint-navy) 78%);
+    pointer-events:none;
+  }
+
+  /* ===== Header ===== */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(13,26,48,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--blueprint-line);
+  }
+  .nav-wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height:72px;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1.15rem; font-weight:700; color:var(--paper);
+  }
+  .logo .mark{
+    width:30px; height:30px;
+    border:1.5px solid var(--copper);
+    border-radius:3px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--copper);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.75rem;
+    transform:rotate(0deg);
+    position:relative;
+  }
+  .logo .mark::before, .logo .mark::after{
+    content:"";
+    position:absolute;
+    background:var(--copper);
+  }
+  .logo .mark::before{ width:6px; height:1px; top:-4px; left:-2px; }
+  .logo .mark::after{ width:1px; height:6px; top:-6px; left:-1px; }
+
+  nav.primary-nav{display:flex; align-items:center; gap:36px;}
+  nav.primary-nav > ul{display:flex; gap:36px; align-items:center;}
+  nav.primary-nav a{
+    color:var(--paper); opacity:0.82; font-size:0.94rem; font-weight:500;
+    transition:opacity 0.2s, color 0.2s;
+  }
+  nav.primary-nav a:hover{opacity:1; color:var(--cyan);}
+
+  .dropdown{position:relative;}
+  .dropdown > a::after{
+    content:"▾"; font-size:0.65em; margin-left:5px; opacity:0.7; display:inline-block;
+  }
+  .dropdown-menu{
+    position:absolute; top:calc(100% + 18px); left:50%; transform:translateX(-50%) translateY(-8px);
+    background:var(--blueprint-navy-deep);
+    border:1px solid var(--blueprint-line);
+    min-width:220px;
+    padding:8px;
+    opacity:0; visibility:hidden;
+    transition:opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+    box-shadow:0 12px 28px rgba(0,0,0,0.35);
+  }
+  .dropdown:hover .dropdown-menu,
+  .dropdown:focus-within .dropdown-menu{
+    opacity:1; visibility:visible; transform:translateX(-50%) translateY(0);
+  }
+  .dropdown-menu a{
+    display:flex; flex-direction:column; gap:2px;
+    padding:10px 12px; border-radius:2px; opacity:0.9;
+  }
+  .dropdown-menu a:hover{background:rgba(111,187,199,0.08);}
+  .dropdown-menu a span.d-title{font-weight:600; color:var(--paper); font-size:0.9rem;}
+  .dropdown-menu a span.d-desc{font-size:0.76rem; color:#93a3ba; font-family:'IBM Plex Mono', monospace;}
+
+  .cta-btn{
+    background:var(--copper);
+    color:var(--paper);
+    padding:11px 22px;
+    font-weight:600;
+    font-size:0.92rem;
+    border-radius:2px;
+    transition:background 0.2s, transform 0.15s;
+    display:inline-block;
+    white-space:nowrap;
+  }
+  .cta-btn:hover{background:var(--copper-dark); transform:translateY(-1px);}
+  .cta-ghost{
+    border:1px solid var(--blueprint-line);
+    color:var(--paper);
+    padding:10px 20px;
+    font-size:0.92rem;
+    font-weight:500;
+    border-radius:2px;
+    transition:border-color 0.2s, color 0.2s;
+  }
+  .cta-ghost:hover{border-color:var(--cyan); color:var(--cyan);}
+
+  .nav-toggle{
+    display:none; flex-direction:column; gap:5px;
+    background:none; border:none;
+  }
+  .nav-toggle span{width:26px; height:2px; background:var(--paper); border-radius:2px; transition:0.25s;}
+
+  /* ===== Hero ===== */
+  .hero{
+    padding:168px 0 120px;
+    position:relative;
+  }
+  .hero-inner{
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:56px; align-items:center;
+    position:relative; z-index:2;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--cyan);
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:22px;
+  }
+  .eyebrow::before{content:""; width:26px; height:1px; background:var(--cyan); display:block;}
+  .hero h1{
+    font-size:3.4rem; line-height:1.08; color:var(--paper);
+    margin-bottom:22px;
+  }
+  .hero h1 .accent{color:var(--copper);}
+  .hero p.lede{
+    font-size:1.12rem; color:#c3cede; max-width:480px; margin-bottom:34px;
+  }
+  .hero-actions{display:flex; gap:16px; align-items:center; flex-wrap:wrap;}
+  .hero-actions .cta-ghost{color:var(--paper); border-color:var(--blueprint-line);}
+
+  /* Hero diagram / signature element */
+  .blueprint-diagram{position:relative; width:100%;}
+  .blueprint-diagram svg{width:100%; height:auto;}
+  .dim-label{
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px; fill:var(--cyan); letter-spacing:0.03em;
+  }
+  .dim-line{stroke:var(--cyan); stroke-width:1; opacity:0.55;}
+  .dim-tick{stroke:var(--cyan); stroke-width:1; opacity:0.55;}
+
+  /* ===== Section shared ===== */
+  section{padding:100px 0;}
+  .section-head{max-width:640px; margin:0 auto 56px; text-align:center;}
+  .section-head .eyebrow{justify-content:center; color:var(--copper-dark);}
+  .section-head .eyebrow::before{background:var(--copper-dark);}
+  .section-head h2{font-size:2.2rem; color:var(--ink); margin-bottom:14px;}
+  .section-head p{color:var(--ink-soft); font-size:1.02rem;}
+
+  /* ===== Features ===== */
+  .features{background:var(--paper);}
+  .feature-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:22px;
+  }
+  .feature-card{
+    background:#fff;
+    border:1px dashed #d7cdb8;
+    border-radius:2px;
+    padding:32px 26px;
+    position:relative;
+    transition:border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .feature-card::before, .feature-card::after{
+    content:""; position:absolute; width:9px; height:9px;
+    border-top:1.5px solid var(--copper); border-left:1.5px solid var(--copper);
+  }
+  .feature-card::before{top:-1px; left:-1px;}
+  .feature-card::after{bottom:-1px; right:-1px; transform:rotate(180deg);}
+  .feature-card:hover{
+    border-color:var(--copper);
+    transform:translateY(-4px);
+    box-shadow:0 16px 30px rgba(22,32,44,0.08);
+  }
+  .feature-icon{
+    width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--blueprint-navy);
+    border-radius:2px;
+    color:var(--cyan);
+    margin-bottom:20px;
+  }
+  .feature-icon svg{width:22px; height:22px;}
+  .feature-card h3{font-size:1.08rem; margin-bottom:10px; color:var(--ink);}
+  .feature-card p{font-size:0.92rem; color:var(--ink-soft);}
+  .feature-tag{
+    font-family:'IBM Plex Mono', monospace; font-size:0.68rem; color:var(--copper-dark);
+    letter-spacing:0.08em; text-transform:uppercase; margin-bottom:12px; display:block;
+  }
+
+  /* ===== About teaser strip ===== */
+  .about-strip{
+    background:var(--blueprint-navy);
+    color:var(--paper);
+    padding:80px 0;
+  }
+  .about-strip-inner{
+    display:grid; grid-template-columns:0.9fr 1.1fr; gap:50px; align-items:center;
+  }
+  .about-strip h2{font-size:1.9rem; color:var(--paper); margin-bottom:18px;}
+  .about-strip p{color:#b9c5d8; font-size:1rem; margin-bottom:24px;}
+  .stat-row{display:flex; gap:40px; flex-wrap:wrap;}
+  .stat{border-left:2px solid var(--copper); padding-left:14px;}
+  .stat .num{font-family:'Space Grotesk', sans-serif; font-size:1.9rem; font-weight:700; color:var(--paper);}
+  .stat .label{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:#93a3ba; text-transform:uppercase; letter-spacing:0.06em;}
+
+  /* ===== CTA band ===== */
+  .cta-band{
+    background:var(--paper-dim);
+    text-align:center;
+    padding:90px 0;
+  }
+  .cta-band h2{font-size:2rem; margin-bottom:16px;}
+  .cta-band p{color:var(--ink-soft); margin-bottom:30px;}
+
+  /* ===== Footer ===== */
+  footer{
+    background:var(--blueprint-navy-deep);
+    color:#93a3ba;
+    padding:60px 0 28px;
+  }
+  .footer-grid{
+    display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:40px;
+    padding-bottom:40px; border-bottom:1px solid var(--blueprint-line);
+  }
+  .footer-grid h4{color:var(--paper); font-size:0.95rem; margin-bottom:16px;}
+  .footer-grid .logo{margin-bottom:14px;}
+  .footer-grid p{font-size:0.88rem; max-width:280px;}
+  .footer-grid ul li{margin-bottom:10px;}
+  .footer-grid ul li a{font-size:0.88rem; color:#93a3ba; transition:color 0.2s;}
+  .footer-grid ul li a:hover{color:var(--cyan);}
+  .footer-bottom{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+    padding-top:24px; font-size:0.82rem;
+  }
+  .footer-bottom .legal-links{display:flex; gap:20px;}
+  .footer-bottom .legal-links a{color:#93a3ba;}
+  .footer-bottom .legal-links a:hover{color:var(--cyan);}
+
+  /* ===== Responsive ===== */
+  @media (max-width:980px){
+    .hero-inner{grid-template-columns:1fr;}
+    .blueprint-diagram{order:-1; max-width:420px; margin:0 auto;}
+    .feature-grid{grid-template-columns:repeat(2,1fr);}
+    .about-strip-inner{grid-template-columns:1fr;}
+    .footer-grid{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:760px){
+    nav.primary-nav{
+      position:fixed; top:72px; left:0; right:0; bottom:0;
+      background:var(--blueprint-navy-deep);
+      flex-direction:column; align-items:stretch;
+      padding:28px 24px; gap:0;
+      transform:translateX(100%); transition:transform 0.3s ease;
+      overflow-y:auto;
+    }
+    nav.primary-nav.open{transform:translateX(0);}
+    nav.primary-nav > ul{flex-direction:column; align-items:stretch; gap:0; width:100%;}
+    nav.primary-nav > ul > li{border-bottom:1px solid var(--blueprint-line);}
+    nav.primary-nav > ul > li > a{padding:16px 4px; display:block;}
+    .dropdown-menu{
+      position:static; opacity:1; visibility:visible; transform:none;
+      display:none; border:none; background:rgba(255,255,255,0.03); margin-top:0;
+    }
+    .dropdown.open .dropdown-menu{display:block;}
+    .nav-actions{display:flex; flex-direction:column; gap:12px; margin-top:20px;}
+    .nav-toggle{display:flex;}
+    .hero{padding-top:140px;}
+    .hero h1{font-size:2.3rem;}
+    .feature-grid{grid-template-columns:1fr;}
+    .footer-grid{grid-template-columns:1fr;}
+    .footer-bottom{flex-direction:column; align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav-wrap">
+    <a href="#top" class="logo"><span class="mark">M</span> MainCrafts</a>
+    <nav class="primary-nav" id="primaryNav">
+      <ul>
+        <li><a href="#top">Home</a></li>
+        <li><a href="#features">Features</a></li>
+        <li class="dropdown" id="servicesDropdown">
+          <a href="#services" id="servicesToggle">Services</a>
+          <div class="dropdown-menu">
+            <a href="#"><span class="d-title">Product Design</span><span class="d-desc">Wireframes to prototypes</span></a>
+            <a href="#"><span class="d-title">Development</span><span class="d-desc">Full-stack build & launch</span></a>
+            <a href="#"><span class="d-title">Scaling & Support</span><span class="d-desc">Infra, monitoring, growth</span></a>
+          </div>
+        </li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="#contact" class="cta-ghost">Apply Now</a>
+        <a href="#contact" class="cta-btn">Get Started</a>
+      </div>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section class="hero grid-bg" id="top">
+  <div class="container hero-inner">
+    <div>
+      <div class="eyebrow">Full-Stack Build Studio</div>
+      <h1>Build Smarter with <span class="accent">MainCrafts</span> 🚀</h1>
+      <p class="lede">From first sketch to shipped product — we design, engineer, and scale the software your idea deserves, on a foundation built to last.</p>
+      <div class="hero-actions">
+        <a href="#contact" class="cta-btn">Get Started</a>
+        <a href="#features" class="cta-ghost">See What We Build</a>
+      </div>
+    </div>
+    <div class="blueprint-diagram">
+      <svg viewBox="0 0 420 360" xmlns="http://www.w3.org/2000/svg">
+        <!-- structure outline -->
+        <rect x="70" y="40" width="280" height="200" rx="2" fill="none" stroke="#3a5a86" stroke-width="1.2"/>
+        <line x1="70" y1="120" x2="350" y2="120" stroke="#3a5a86" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="210" y1="40" x2="210" y2="240" stroke="#3a5a86" stroke-width="1" stroke-dasharray="4 4"/>
+        <rect x="90" y="60" width="100" height="45" fill="none" stroke="#6fbbc7" stroke-width="1.2"/>
+        <rect x="230" y="60" width="100" height="45" fill="none" stroke="#c97d3e" stroke-width="1.2"/>
+        <rect x="90" y="140" width="240" height="80" fill="none" stroke="#6fbbc7" stroke-width="1.2"/>
+        <circle cx="140" cy="180" r="14" fill="none" stroke="#c97d3e" stroke-width="1.2"/>
+        <circle cx="180" cy="180" r="14" fill="none" stroke="#c97d3e" stroke-width="1.2"/>
+        <circle cx="220" cy="180" r="14" fill="none" stroke="#c97d3e" stroke-width="1.2"/>
+
+        <!-- dimension lines -->
+        <line class="dim-line" x1="70" y1="256" x2="350" y2="256"/>
+        <line class="dim-tick" x1="70" y1="250" x2="70" y2="262"/>
+        <line class="dim-tick" x1="350" y1="250" x2="350" y2="262"/>
+        <text x="185" y="276" class="dim-label">FRONTEND — 280PX</text>
+
+        <line class="dim-line" x1="366" y1="40" x2="366" y2="240"/>
+        <line class="dim-tick" x1="360" y1="40" x2="372" y2="40"/>
+        <line class="dim-tick" x1="360" y1="240" x2="372" y2="240"/>
+        <text x="374" y="145" class="dim-label" transform="rotate(90 374 145)">STACK</text>
+
+        <text x="90" y="52" class="dim-label" fill="#6fbbc7">UI LAYER</text>
+        <text x="230" y="52" class="dim-label" fill="#c97d3e">API LAYER</text>
+        <text x="90" y="132" class="dim-label" fill="#6fbbc7">DATA MODELS</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">What We Build</div>
+      <h2>Four pillars, one build</h2>
+      <p>Every MainCrafts project is engineered around the same core standards — speed, adaptability, and staying power.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        </div>
+        <span class="feature-tag">Performance</span>
+        <h3>Fast</h3>
+        <p>Optimized rendering and lean code paths so your product feels instant, not just fast on paper.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M7 8V6a5 5 0 0 1 10 0v2"/></svg>
+        </div>
+        <span class="feature-tag">Devices</span>
+        <h3>Responsive</h3>
+        <p>Every layout adapts across desktop, tablet, and mobile — no separate build, one clean codebase.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+        </div>
+        <span class="feature-tag">Growth</span>
+        <h3>Scalable</h3>
+        <p>Architecture that holds up under real traffic, so growth never means a rebuild from scratch.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <span class="feature-tag">Reliability</span>
+        <h3>Always On</h3>
+        <p>Monitoring and support baked in from day one, so uptime is a guarantee, not an afterthought.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about-strip">
+  <div class="container about-strip-inner">
+    <div>
+      <div class="eyebrow">About MainCrafts</div>
+      <h2>Small studio. Full-stack range.</h2>
+      <p>We're a tight team of designers and engineers who treat every landing page, dashboard, or platform like it's going into production on day one — because it usually is.</p>
+      <a href="#contact" class="cta-ghost">Learn About Us</a>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="num">120+</div><div class="label">Products Shipped</div></div>
+      <div class="stat"><div class="num">98%</div><div class="label">Client Retention</div></div>
+      <div class="stat"><div class="num">6 DAY</div><div class="label">Avg. Sprint Cycle</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band" id="contact">
+  <div class="container">
+    <h2>Ready to build smarter?</h2>
+    <p>Tell us what you're making — we'll tell you how fast we can ship it.</p>
+    <div class="hero-actions" style="justify-content:center;">
+      <a href="#" class="cta-btn">Apply Now</a>
+      <a href="#" class="cta-ghost" style="color:var(--ink); border-color:#c7bda3;">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="#top" class="logo"><span class="mark">M</span> MainCrafts</a>
+        <p>A full-stack build studio for startups, founders, and product teams who need it done right, fast.</p>
+      </div>
+      <div>
+        <h4>Navigate</h4>
+        <ul>
+          <li><a href="#top">Home</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#">Product Design</a></li>
+          <li><a href="#">Development</a></li>
+          <li><a href="#">Scaling & Support</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:hello@maincrafts.dev">hello@maincrafts.dev</a></li>
+          <li><a href="tel:+10000000000">+1 (000) 000-0000</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 MainCrafts. All rights reserved.</span>
+      <div class="legal-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const navToggle = document.getElementById('navToggle');
+  const primaryNav = document.getElementById('primaryNav');
+  navToggle.addEventListener('click', () => {
+    primaryNav.classList.toggle('open');
+    navToggle.classList.toggle('active');
+  });
+
+  // Mobile: tap "Services" to expand dropdown instead of hover
+  const servicesDropdown = document.getElementById('servicesDropdown');
+  const servicesToggle = document.getElementById('servicesToggle');
+  servicesToggle.addEventListener('click', (e) => {
+    if (window.innerWidth <= 760) {
+      e.preventDefault();
+      servicesDropdown.classList.toggle('open');
+    }
+  });
+
+  // Close mobile nav after clicking a link
+  document.querySelectorAll('.primary-nav a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 760 && link !== servicesToggle) {
+        primaryNav.classList.remove('open');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
